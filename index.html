@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>琰宝宝今天吃什么呢 ❤️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ========================
+       基础重置与变量
+    ======================== */
+    :root {
+      --primary: #FFB347;
+      --primary-dark: #FFA726;
+      --cream: #FFF5E6;
+      --cream-dark: #FFE8CC;
+      --text: #4A4A4A;
+      --text-light: #888888;
+      --white: #FFFFFF;
+      --danger: #FF8A80;
+      --danger-dark: #FF6E66;
+      --success: #81C784;
+      --shadow: 0 8px 32px rgba(255, 179, 71, 0.15);
+      --shadow-hover: 0 12px 40px rgba(255, 179, 71, 0.25);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 50%, var(--cream) 100%);
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0.03;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ========================
+       头部
+    ======================== */
+    .header {
+      text-align: center;
+      padding: 16px 0 4px;
+    }
+
+    .header h1 {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+      text-shadow: 2px 2px 0px rgba(255, 179, 71, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .header .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .header .hearts {
+      font-size: 1.2rem;
+      margin-top: 6px;
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* ========================
+       分类筛选
+    ======================== */
+    .category-filter {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 0;
+      margin-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      align-items: center;
+    }
+    .category-filter::-webkit-scrollbar { display: none; }
+
+    .category-chip {
+      flex-shrink: 0;
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      background: var(--white);
+      color: var(--text-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .category-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .category-chip.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(255, 179, 71, 0.3);
+    }
+
+    .category-manage-btn {
+      flex-shrink: 0;
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 2px dashed var(--cream-dark);
+      background: var(--white);
+      color: var(--text-light);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .category-manage-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    /* ========================
+       主卡片
+    ======================== */
+    .main-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .main-card::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,179,71,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .dish-display {
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dish-emoji-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cream), var(--cream-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 16px rgba(255,179,71,0.2);
+      transition: var(--transition);
+      overflow: hidden;
+    }
+    .dish-emoji-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .dish-display.animating .dish-emoji-img {
+      animation: bounce 0.5s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.1); }
+    }
+
+    .dish-name {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .dish-meta {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .dish-tag {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--cream);
+      color: var(--primary-dark);
+    }
+
+    .dish-note {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      font-style: italic;
+      max-width: 90%;
+    }
+
+    .placeholder-text {
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+
+    /* ========================
+       按钮
+    ======================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 36px;
+      border-radius: 50px;
+      border: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      box-shadow: 0 8px 24px rgba(255,179,71,0.35);
+      width: 100%;
+      margin-top: 20px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255,179,71,0.45);
+    }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--primary-dark);
+      border: 2px solid var(--primary);
+      padding: 10px 24px;
+      font-size: 0.9rem;
+    }
+    .btn-secondary:hover { background: var(--cream); }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+      color: var(--white);
+      padding: 10px 24px;
+      font-size: 0.9rem;
+    }
+
+    .btn-small {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      border-radius: 20px;
+    }
+
+    .share-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .share-bar .btn {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    /* ========================
+       今日历史
+    ======================== */
+    .history-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    .history-item:hover {
+      background: var(--cream-dark);
+      transform: translateX(4px);
+    }
+    .history-item .time {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+    .history-item .name {
+      flex: 1;
+      font-weight: 600;
+    }
+    .empty-history {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      padding: 10px 0;
+    }
+
+    /* ========================
+       我的菜单
+    ======================== */
+    .menu-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .menu-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .menu-add-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 2px dashed var(--primary);
+      background: var(--cream);
+      color: var(--primary-dark);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .menu-add-btn:hover {
+      background: var(--primary);
+      color: var(--white);
+      border-style: solid;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .menu-item:hover {
+      background: var(--cream-dark);
+      transform: translateX(4px);
+    }
+
+    .menu-item-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFF, var(--cream-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .menu-item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .menu-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .menu-item-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+
+    .menu-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .menu-item-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .menu-empty {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      padding: 20px 0;
+    }
+
+    /* ========================
+       图片上传区域
+    ======================== */
+    .image-upload-area {
+      width: 100%;
+      height: 160px;
+      border: 2px dashed var(--cream-dark);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .image-upload-area:hover {
+      border-color: var(--primary);
+      background: var(--cream);
+    }
+    .image-upload-area.has-image {
+      border-style: solid;
+      border-color: var(--primary);
+    }
+    .image-upload-area .upload-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .image-upload-area .upload-text {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    .image-upload-area .upload-preview {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .image-upload-area .upload-clear {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      color: var(--white);
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .image-upload-area.has-image .upload-clear {
+      display: flex;
+    }
+    .image-upload-area.has-image .upload-icon,
+    .image-upload-area.has-image .upload-text {
+      display: none;
+    }
+
+    /* ========================
+       幸运轮盘
+    ======================== */
+    .wheel-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      transform-origin: 100% 100%;
+      left: 0; top: 0;
+      overflow: hidden;
+    }
+
+    .wheel-segment-inner {
+      position: absolute;
+      right: -10px;
+      bottom: 10px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      transform-origin: center center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    .wheel-segment-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .wheel-segment-label {
+      position: absolute;
+      right: 38px;
+      bottom: 22px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--white);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      transform-origin: right center;
+    }
+
+    .wheel-center {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      background: var(--white);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 26px solid var(--danger);
+      z-index: 3;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .wheel-result {
+      margin-top: 16px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      min-height: 32px;
+    }
+
+    .wheel-preview {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .wheel-preview-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: var(--cream);
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .wheel-preview-item img {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* ========================
+       表单样式
+    ======================== */
+    .form-group { margin-bottom: 14px; }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--cream-dark);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: var(--white);
+      transition: var(--transition);
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(255,179,71,0.15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .spice-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .spice-option {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid var(--cream-dark);
+      background: var(--white);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .spice-option.selected {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      border-color: var(--primary);
+    }
+
+    /* ========================
+       分类管理弹窗
+    ======================== */
+    .cat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .cat-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .cat-list-item .cat-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cat-list-item .cat-count {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-weight: 500;
+      margin-left: 8px;
+    }
+
+    .cat-list-item .cat-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .cat-add-row {
+      display: flex;
+      gap: 8px;
+    }
+    .cat-add-row input {
+      flex: 1;
+    }
+    .cat-add-row button {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    /* 统计信息 */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--cream), var(--cream-dark));
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* ========================
+       Toast提示
+    ======================== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ========================
+       模态框
+    ======================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 1.2rem; font-weight: 700; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+    .modal-close:hover {
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions .btn {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    /* ========================
+       响应式
+    ======================== */
+    @media (min-width: 481px) {
+      .app { padding: 30px 20px; }
+      .header h1 { font-size: 2rem; }
+      .wheel-container { width: 320px; height: 320px; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--cream-dark); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- 头部 -->
+    <header class="header">
+      <h1>琰宝宝今天吃什么呢？</h1>
+      <p class="subtitle">让美食选择不再困难 ✨</p>
+      <div class="hearts">💕 🍽️ 💕</div>
+    </header>
+
+    <!-- 分类筛选 -->
+    <div class="category-filter" id="categoryFilter"></div>
+
+    <!-- 主卡片：随机推荐 -->
+    <div class="main-card">
+      <div class="dish-display" id="dishDisplay">
+        <div class="placeholder-text">点下面的按钮，看看今天吃啥吧～</div>
+      </div>
+      <button class="btn btn-primary" id="randomBtn" onclick="app.randomPick()">
+        <span>🎲</span> 随机推荐
+      </button>
+      <div class="share-bar" id="shareBar" style="display:none;">
+        <button class="btn btn-secondary" onclick="app.shareToClipboard()">
+          <span>💌</span> 分享给女朋友
+        </button>
+        <button class="btn btn-secondary" onclick="app.openWheel()">
+          <span>🎯</span> 幸运轮盘
+        </button>
+      </div>
+    </div>
+
+    <!-- 今日历史 -->
+    <div class="history-section">
+      <div class="section-header">
+        <div class="section-title"><span>📋</span> 今日历史</div>
+        <button class="btn btn-small btn-danger" onclick="app.clearHistory()">清空</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="empty-history">今天还没有推荐过菜品哦～</div>
+      </div>
+    </div>
+
+    <!-- ★ 我的菜单 -->
+    <div class="menu-section">
+      <div class="menu-top-bar">
+        <div class="section-title"><span>📖</span> 我的菜单</div>
+        <div style="display:flex; gap:8px;">
+          <button class="menu-add-btn" onclick="app.shareMenuLink()" style="border-style:solid;background:linear-gradient(135deg,#FFB347,#FFA726);color:#FFF;">🔗 分享菜单</button>
+          <button class="menu-add-btn" onclick="app.openAddModal()">＋ 添加菜品</button>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">总菜品</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="statCategories">0</div>
+          <div class="stat-label">分类数</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="statToday">0</div>
+          <div class="stat-label">今日推荐</div>
+        </div>
+      </div>
+
+      <div class="menu-list" id="menuList">
+        <div class="menu-empty">还没有菜品，快来添加吧～ ✨</div>
+      </div>
+    </div>
+
+    <!-- 底部留白 -->
+    <div style="height: 40px;"></div>
+  </div>
+
+  <!-- 轮盘弹窗 -->
+  <div class="modal-overlay" id="wheelModal" onclick="app.closeWheel(event)">
+    <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">🎯 幸运轮盘</div>
+        <button class="modal-close" onclick="app.closeWheel()">&times;</button>
+      </div>
+      <div class="wheel-container">
+        <div class="wheel-pointer"></div>
+        <div class="wheel" id="wheel"></div>
+        <div class="wheel-center">❤️</div>
+      </div>
+      <div class="wheel-result" id="wheelResult"></div>
+      <div class="wheel-preview" id="wheelPreview"></div>
+      <button class="btn btn-primary" id="spinBtn" onclick="app.spinWheel()" style="margin-top:16px;">开始旋转</button>
+    </div>
+  </div>
+
+  <!-- 添加菜品弹窗 -->
+  <div class="modal-overlay" id="addModal" onclick="app.closeAddModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">✏️ 添加菜品</div>
+        <button class="modal-close" onclick="app.closeAddModal()">&times;</button>
+      </div>
+      <form onsubmit="app.addDish(event)">
+        <div class="form-group">
+          <label class="form-label">菜品图片（可选）</label>
+          <div class="image-upload-area" id="addImageUpload" onclick="document.getElementById('addImageInput').click()">
+            <span class="upload-icon">📷</span>
+            <span class="upload-text">点击上传菜品图片</span>
+            <img class="upload-preview" id="addImagePreview" style="display:none;">
+            <button type="button" class="upload-clear" onclick="event.stopPropagation(); app.clearAddImage()">&times;</button>
+          </div>
+          <input type="file" id="addImageInput" accept="image/*" style="display:none;" onchange="app.handleAddImage(event)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">菜品名称 *</label>
+          <input type="text" class="form-input" id="inputName" placeholder="例如：红烧肉" required maxlength="20">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">分类 *</label>
+            <select class="form-select" id="inputCategory" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">图标（无图片时显示）</label>
+            <select class="form-select" id="inputIcon"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">辣度</label>
+          <div class="spice-options" id="spiceOptions">
+            <button type="button" class="spice-option" data-value="不辣" onclick="app.selectSpice(this)">不辣</button>
+            <button type="button" class="spice-option" data-value="微辣" onclick="app.selectSpice(this)">微辣</button>
+            <button type="button" class="spice-option" data-value="中辣" onclick="app.selectSpice(this)">中辣</button>
+            <button type="button" class="spice-option" data-value="特辣" onclick="app.selectSpice(this)">特辣</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <input type="text" class="form-input" id="inputNote" placeholder="例如：上次吃的时候超级满足！" maxlength="50">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="app.closeAddModal()">取消</button>
+          <button type="submit" class="btn btn-primary">添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 编辑菜品弹窗 -->
+  <div class="modal-overlay" id="editModal" onclick="app.closeEditModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">✏️ 编辑菜品</div>
+        <button class="modal-close" onclick="app.closeEditModal()">&times;</button>
+      </div>
+      <form onsubmit="app.saveEdit(event)">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label class="form-label">菜品图片（可选）</label>
+          <div class="image-upload-area" id="editImageUpload" onclick="document.getElementById('editImageInput').click()">
+            <span class="upload-icon">📷</span>
+            <span class="upload-text">点击上传菜品图片</span>
+            <img class="upload-preview" id="editImagePreview" style="display:none;">
+            <button type="button" class="upload-clear" onclick="event.stopPropagation(); app.clearEditImage()">&times;</button>
+          </div>
+          <input type="file" id="editImageInput" accept="image/*" style="display:none;" onchange="app.handleEditImage(event)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">菜品名称 *</label>
+          <input type="text" class="form-input" id="editName" required maxlength="20">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">分类 *</label>
+            <select class="form-select" id="editCategory" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">图标（无图片时显示）</label>
+            <select class="form-select" id="editIcon"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">辣度</label>
+          <div class="spice-options" id="editSpiceOptions">
+            <button type="button" class="spice-option" data-value="不辣" onclick="app.selectEditSpice(this)">不辣</button>
+            <button type="button" class="spice-option" data-value="微辣" onclick="app.selectEditSpice(this)">微辣</button>
+            <button type="button" class="spice-option" data-value="中辣" onclick="app.selectEditSpice(this)">中辣</button>
+            <button type="button" class="spice-option" data-value="特辣" onclick="app.selectEditSpice(this)">特辣</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <input type="text" class="form-input" id="editNote" maxlength="50">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="app.closeEditModal()">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 分类管理弹窗 -->
+  <div class="modal-overlay" id="catModal" onclick="app.closeCatModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ 管理分类</div>
+        <button class="modal-close" onclick="app.closeCatModal()">&times;</button>
+      </div>
+      <div class="cat-list" id="catList"></div>
+      <div class="cat-add-row">
+        <input type="text" class="form-input" id="newCatName" placeholder="新分类名称" maxlength="10">
+        <button type="button" onclick="app.addCategory()">添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /**
+     * ========================================
+     * 琰宝宝今天吃什么呢 - 主应用逻辑
+     * ========================================
+     */
+
+    const ICONS = [
+      {v:'🍜',t:'面食'},{v:'🍚',t:'米饭'},{v:'🍖',t:'肉类'},{v:'🥗',t:'沙拉'},
+      {v:'🍕',t:'披萨'},{v:'🍔',t:'汉堡'},{v:'🍣',t:'寿司'},{v:'🍰',t:'甜点'},
+      {v:'🧋',t:'饮品'},{v:'🥘',t:'锅物'},{v:'🍳',t:'早餐'},{v:'🥟',t:'饺子'},
+      {v:'🌮',t:'卷饼'},{v:'🍛',t:'咖喱'},{v:'🦐',t:'海鲜'},{v:'🍗',t:'炸鸡'},
+      {v:'🥩',t:'牛排'},{v:'🍝',t:'意面'},{v:'🐟',t:'鱼'},{v:'🍲',t:'汤'},
+      {v:'🍢',t:'串串'},{v:'🥪',t:'三明治'},{v:'🌭',t:'热狗'},{v:'🍱',t:'便当'}
+    ];
+
+    // 预置菜品
+    const DEFAULT_DISHES = [
+      { id:'d1', name:'红烧肉',   category:'中餐', icon:'🍖', spice:'不辣', note:'肥而不腻，入口即化～' },
+      { id:'d2', name:'番茄牛腩面', category:'中餐', icon:'🍜', spice:'不辣', note:'汤汁浓郁，暖胃首选' },
+      { id:'d3', name:'意式肉酱面', category:'西餐', icon:'🍝', spice:'不辣', note:'经典意式风味' },
+      { id:'d4', name:'麻辣火锅',   category:'中餐', icon:'🥘', spice:'特辣', note:'无辣不欢的首选！' },
+      { id:'d5', name:'寿司拼盘',   category:'日料', icon:'🍣', spice:'不辣', note:'新鲜美味，精致享受' },
+      { id:'d6', name:'韩式炸鸡',   category:'韩料', icon:'🍗', spice:'微辣', note:'外酥里嫩，配上啤酒更棒' },
+      { id:'d7', name:'牛肉汉堡',   category:'快餐', icon:'🍔', spice:'不辣', note:'大口咬下，满足感爆棚' },
+      { id:'d8', name:'抹茶千层',   category:'甜品', icon:'🍰', spice:'不辣', note:'饭后甜品的完美选择' },
+      { id:'d9', name:'珍珠奶茶',   category:'饮品', icon:'🧋', spice:'不辣', note:'一杯快乐，烦恼全无' },
+      { id:'d10',name:'酸菜鱼',     category:'中餐', icon:'🐟', spice:'中辣', note:'酸辣开胃，超级下饭' },
+      { id:'d11',name:'日式拉面',   category:'日料', icon:'🍜', spice:'不辣', note:'汤头鲜美，配料丰富' },
+      { id:'d12',name:'芝士披萨',   category:'西餐', icon:'🍕', spice:'不辣', note:'拉丝芝士，幸福满满' }
+    ];
+
+    const STORAGE_KEY   = 'ybb_whatToEat_dishes';
+    const HISTORY_KEY   = 'ybb_whatToEat_history';
+    const HISTORY_DATE_KEY = 'ybb_whatToEat_historyDate';
+    const CATS_KEY      = 'ybb_whatToEat_categories';
+
+    class App {
+      constructor() {
+        this.dishes       = this.loadDishes();
+        this.history      = this.loadHistory();
+        this.activeCat    = '全部';
+        this.selectedSpice = '';
+        this.editSpice    = '';
+        this.currentDish  = null;
+        this.wheelDishes  = [];
+        this.isSpinning   = false;
+        this.addImageData = '';
+        this.editImageData = '';
+        this.init();
+      }
+
+      /* ========== 存储 ========== */
+      loadDishes() {
+        const hashData = this.readHashData();
+        if (hashData && Array.isArray(hashData) && hashData.length) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(hashData));
+          history.replaceState(null, '', location.pathname + location.search);
+          return hashData;
+        }
+        try {
+          const d = localStorage.getItem(STORAGE_KEY);
+          if (d) return JSON.parse(d);
+        } catch(e) {}
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DISHES));
+        return [...DEFAULT_DISHES];
+      }
+
+      readHashData() {
+        try {
+          const h = location.hash;
+          if (!h) return null;
+          const m = h.match(/menu=([^&]+)/);
+          if (!m) return null;
+          const json = decodeURIComponent(escape(atob(m[1])));
+          return JSON.parse(json);
+        } catch(e) { return null; }
+      }
+
+      shareMenuLink() {
+        if (!this.dishes.length) { this.showToast('菜单是空的，先添加菜品吧'); return; }
+        try {
+          // 分享时去掉图片数据（太大了），只保留其他信息
+          const shareDishes = this.dishes.map(d => {
+            const { image, ...rest } = d;
+            return rest;
+          });
+          const str = JSON.stringify(shareDishes);
+          const b64 = btoa(unescape(encodeURIComponent(str)));
+          const url = location.origin + location.pathname + '#menu=' + b64;
+          const tip = '分享链接已复制！发给女朋友，她打开就能看到你的菜单 ✨';
+          if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(url).then(()=>this.showToast(tip)).catch(()=>this.fallbackCopy(url, tip));
+          } else {
+            this.fallbackCopy(url, tip);
+          }
+        } catch(e) {
+          this.showToast('菜单数据太大，无法生成分享链接');
+        }
+      }
+
+      fallbackCopy(text, tip) {
+        const t = document.createElement('textarea');
+        t.value = text; t.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(t); t.select();
+        try { document.execCommand('copy'); this.showToast(tip||'已复制！'); }
+        catch(e) { this.showToast('复制失败，请手动复制网址'); }
+        document.body.removeChild(t);
+      }
+
+      saveDishes() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.dishes)); }
+        catch(e) { this.showToast('保存失败，存储空间可能已满'); }
+      }
+
+      loadHistory() {
+        try {
+          const d = new Date().toDateString();
+          if (localStorage.getItem(HISTORY_DATE_KEY) !== d) {
+            localStorage.setItem(HISTORY_DATE_KEY, d);
+            localStorage.setItem(HISTORY_KEY, '[]');
+            return [];
+          }
+          return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        } catch(e) { return []; }
+      }
+
+      saveHistory() {
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
+          localStorage.setItem(HISTORY_DATE_KEY, new Date().toDateString());
+        } catch(e) {}
+      }
+
+      /* ========== 分类 ========== */
+      loadCategories() {
+        try {
+          const d = localStorage.getItem(CATS_KEY);
+          if (d) return JSON.parse(d);
+        } catch(e) {}
+        // 默认从菜品中提取
+        const s = new Set(this.dishes.map(d => d.category));
+        const cats = Array.from(s).sort();
+        localStorage.setItem(CATS_KEY, JSON.stringify(cats));
+        return cats;
+      }
+
+      saveCategories(cats) {
+        localStorage.setItem(CATS_KEY, JSON.stringify(cats));
+      }
+
+      getCategories() {
+        const cats = this.loadCategories();
+        return ['全部', ...cats];
+      }
+
+      /* ========== 初始化 ========== */
+      init() {
+        this.populateIconSelects();
+        this.populateCategorySelects();
+        this.renderCategoryFilter();
+        this.renderMenuList();
+        this.renderHistory();
+        this.updateStats();
+      }
+
+      populateIconSelects() {
+        const opts = ICONS.map(i => `<option value="${i.v}">${i.v} ${i.t}</option>`).join('');
+        document.getElementById('inputIcon').innerHTML = opts;
+        document.getElementById('editIcon').innerHTML = opts;
+      }
+
+      populateCategorySelects() {
+        const cats = this.loadCategories();
+        const opts = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        document.getElementById('inputCategory').innerHTML = '<option value="">请选择</option>' + opts;
+        document.getElementById('editCategory').innerHTML = opts;
+      }
+
+      /* ========== 分类筛选渲染 ========== */
+      renderCategoryFilter() {
+        const c = document.getElementById('categoryFilter');
+        const cats = this.getCategories();
+        c.innerHTML = cats.map(cat =>
+          `<button class="category-chip ${cat===this.activeCat?'active':''}" onclick="app.setCategory('${cat}')">${cat}</button>`
+        ).join('') + `<button class="category-manage-btn" onclick="app.openCatModal()">⚙️ 管理</button>`;
+      }
+
+      setCategory(cat) {
+        this.activeCat = cat;
+        this.renderCategoryFilter();
+      }
+
+      getFiltered() {
+        if (this.activeCat === '全部') return this.dishes;
+        return this.dishes.filter(d => d.category === this.activeCat);
+      }
+
+      /* ========== 分类管理弹窗 ========== */
+      openCatModal() {
+        this.renderCatList();
+        document.getElementById('catModal').classList.add('active');
+      }
+
+      closeCatModal(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('catModal').classList.remove('active');
+      }
+
+      renderCatList() {
+        const cats = this.loadCategories();
+        const c = document.getElementById('catList');
+        if (!cats.length) {
+          c.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:20px;">暂无分类，请在下方添加</div>';
+          return;
+        }
+        c.innerHTML = cats.map(cat => {
+          const count = this.dishes.filter(d => d.category === cat).length;
+          return `
+            <div class="cat-list-item">
+              <div class="cat-name">
+                <span>🏷️</span> ${cat}
+                <span class="cat-count">${count} 道菜</span>
+              </div>
+              <div class="cat-actions">
+                <button class="btn btn-small btn-danger" onclick="app.deleteCategory('${cat}')">删除</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      addCategory() {
+        const input = document.getElementById('newCatName');
+        const name = input.value.trim();
+        if (!name) { this.showToast('请输入分类名称'); return; }
+        const cats = this.loadCategories();
+        if (cats.includes(name)) { this.showToast('该分类已存在'); return; }
+        if (name === '全部') { this.showToast('「全部」是系统保留的'); return; }
+        cats.push(name);
+        this.saveCategories(cats);
+        input.value = '';
+        this.renderCatList();
+        this.renderCategoryFilter();
+        this.populateCategorySelects();
+        this.showToast(`分类「${name}」添加成功`);
+      }
+
+      deleteCategory(cat) {
+        const count = this.dishes.filter(d => d.category === cat).length;
+        if (count > 0) {
+          if (!confirm(`「${cat}」分类下有 ${count} 道菜，删除分类后这些菜品将变为「未分类」。确定删除吗？`)) return;
+          // 将该分类下的菜品改为未分类
+          this.dishes.forEach(d => { if (d.category === cat) d.category = '未分类'; });
+          this.saveDishes();
+          this.renderMenuList();
+          this.updateStats();
+        }
+        const cats = this.loadCategories().filter(c => c !== cat);
+        this.saveCategories(cats);
+        this.renderCatList();
+        this.renderCategoryFilter();
+        this.populateCategorySelects();
+        this.showToast(`分类「${cat}」已删除`);
+      }
+
+      /* ========== 图片上传 ========== */
+      handleAddImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        this.readImageFile(file, (dataUrl) => {
+          this.addImageData = dataUrl;
+          const area = document.getElementById('addImageUpload');
+          const preview = document.getElementById('addImagePreview');
+          preview.src = dataUrl;
+          preview.style.display = 'block';
+          area.classList.add('has-image');
+        });
+      }
+
+      clearAddImage() {
+        this.addImageData = '';
+        document.getElementById('addImageInput').value = '';
+        const area = document.getElementById('addImageUpload');
+        const preview = document.getElementById('addImagePreview');
+        preview.src = '';
+        preview.style.display = 'none';
+        area.classList.remove('has-image');
+      }
+
+      handleEditImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        this.readImageFile(file, (dataUrl) => {
+          this.editImageData = dataUrl;
+          const area = document.getElementById('editImageUpload');
+          const preview = document.getElementById('editImagePreview');
+          preview.src = dataUrl;
+          preview.style.display = 'block';
+          area.classList.add('has-image');
+        });
+      }
+
+      clearEditImage() {
+        this.editImageData = '';
+        document.getElementById('editImageInput').value = '';
+        const area = document.getElementById('editImageUpload');
+        const preview = document.getElementById('editImagePreview');
+        preview.src = '';
+        preview.style.display = 'none';
+        area.classList.remove('has-image');
+      }
+
+      readImageFile(file, callback) {
+        if (file.size > 2 * 1024 * 1024) {
+          this.showToast('图片太大，请选2MB以内的');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => callback(e.target.result);
+        reader.readAsDataURL(file);
+      }
+
+      /* ========== 随机推荐 ========== */
+      randomPick() {
+        const pool = this.getFiltered();
+        if (!pool.length) { this.showToast('该分类下没有菜品，请添加或切换分类'); return; }
+
+        const histNames = this.history.map(h => h.name);
+        let avail = pool.filter(d => !histNames.includes(d.name));
+        if (!avail.length || pool.length < 5) avail = pool;
+
+        const disp = document.getElementById('dishDisplay');
+        const btn  = document.getElementById('randomBtn');
+        disp.classList.add('animating');
+        btn.disabled = true;
+
+        let cnt = 0;
+        const iv = setInterval(() => {
+          this.renderDishDisplay(avail[Math.floor(Math.random()*avail.length)], true);
+          if (++cnt >= 12) {
+            clearInterval(iv);
+            const pick = avail[Math.floor(Math.random()*avail.length)];
+            this.currentDish = pick;
+            this.renderDishDisplay(pick, false);
+            this.addToHistory(pick);
+            disp.classList.remove('animating');
+            btn.disabled = false;
+            document.getElementById('shareBar').style.display = 'flex';
+            this.showToast(`今天吃「${pick.name}」吧！`);
+          }
+        }, 100);
+      }
+
+      renderDishDisplay(dish) {
+        const c = document.getElementById('dishDisplay');
+        const se = { '不辣':'🌶️❌','微辣':'🌶️','中辣':'🌶️🌶️','特辣':'🌶️🌶️🌶️' };
+        const imgHtml = dish.image
+          ? `<img src="${dish.image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+          : (dish.icon || '🍽️');
+        c.innerHTML = `
+          <div class="dish-emoji-img">${imgHtml}</div>
+          <div class="dish-name">${dish.name}</div>
+          <div class="dish-meta">
+            <span class="dish-tag">${dish.category}</span>
+            ${dish.spice?`<span class="dish-tag">${se[dish.spice]||dish.spice}</span>`:''}
+          </div>
+          ${dish.note?`<div class="dish-note">"${dish.note}"</div>`:''}
+        `;
+      }
+
+      /* ========== 历史 ========== */
+      addToHistory(dish) {
+        this.history.unshift({
+          name: dish.name,
+          icon: dish.icon||'🍽️',
+          time: new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})
+        });
+        if (this.history.length > 5) this.history.pop();
+        this.saveHistory();
+        this.renderHistory();
+        this.updateStats();
+      }
+
+      renderHistory() {
+        const c = document.getElementById('historyList');
+        if (!this.history.length) {
+          c.innerHTML = '<div class="empty-history">今天还没有推荐过菜品哦～</div>';
+          return;
+        }
+        c.innerHTML = this.history.map(h => `
+          <div class="history-item">
+            <span style="font-size:1.2rem;">${h.icon}</span>
+            <span class="name">${h.name}</span>
+            <span class="time">${h.time}</span>
+          </div>
+        `).join('');
+      }
+
+      clearHistory() {
+        if (!this.history.length) return;
+        if (!confirm('确定要清空今日历史吗？')) return;
+        this.history = [];
+        this.saveHistory();
+        this.renderHistory();
+        this.updateStats();
+        this.showToast('历史已清空');
+      }
+
+      /* ========== 分享 ========== */
+      shareToClipboard() {
+        if (!this.currentDish) return;
+        const msgs = [
+          `今天吃「${this.currentDish.name}」吧！我已经想好了～ ❤️`,
+          `宝贝，今天咱们吃${this.currentDish.name}怎么样？✨`,
+          `经过一番深思熟虑，今天的美食之选是——${this.currentDish.name}！🎉`,
+          `今天的胃说它想吃${this.currentDish.name}，咱们出发吧！🚀`,
+          `我有一个好主意：${this.currentDish.name}！怎么样？😋`
+        ];
+        const text = msgs[Math.floor(Math.random()*msgs.length)] + '\n\n来自「琰宝宝今天吃什么呢」';
+
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(text).then(()=>this.showToast('已复制，快去发给TA吧！')).catch(()=>this.fallbackCopy(text));
+        } else {
+          this.fallbackCopy(text);
+        }
+      }
+
+      /* ========== 我的菜单 ========== */
+      renderMenuList() {
+        const c = document.getElementById('menuList');
+        if (!this.dishes.length) {
+          c.innerHTML = '<div class="menu-empty">还没有菜品，快来添加吧～ ✨</div>';
+          return;
+        }
+        c.innerHTML = this.dishes.map(d => {
+          const imgHtml = d.image
+            ? `<img src="${d.image}" alt="">`
+            : (d.icon || '🍽️');
+          return `
+          <div class="menu-item">
+            <div class="menu-item-img">${imgHtml}</div>
+            <div class="menu-item-info">
+              <div class="menu-item-name">${d.name}</div>
+              <div class="menu-item-meta">${d.category} ${d.spice?'· '+d.spice:''} ${d.note?'· '+d.note:''}</div>
+            </div>
+            <div class="menu-item-actions">
+              <button class="btn btn-small btn-secondary" onclick="app.openEditModal('${d.id}')">编辑</button>
+              <button class="btn btn-small btn-danger" onclick="app.deleteDish('${d.id}')">删除</button>
+            </div>
+          </div>
+        `;
+        }).join('');
+      }
+
+      /* --- 添加弹窗 --- */
+      openAddModal() {
+        this.clearAddImage();
+        document.getElementById('addModal').classList.add('active');
+        document.getElementById('inputName').value = '';
+        document.getElementById('inputCategory').value = '';
+        document.getElementById('inputIcon').value = '🍜';
+        document.getElementById('inputNote').value = '';
+        document.querySelectorAll('#spiceOptions .spice-option').forEach(b=>b.classList.remove('selected'));
+        this.selectedSpice = '';
+      }
+
+      closeAddModal(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('addModal').classList.remove('active');
+      }
+
+      selectSpice(btn) {
+        document.querySelectorAll('#spiceOptions .spice-option').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        this.selectedSpice = btn.dataset.value;
+      }
+
+      addDish(e) {
+        e.preventDefault();
+        const name = document.getElementById('inputName').value.trim();
+        const cat  = document.getElementById('inputCategory').value;
+        const icon = document.getElementById('inputIcon').value;
+        const note = document.getElementById('inputNote').value.trim();
+        if (!name || !cat) { this.showToast('请填写必填项'); return; }
+        if (this.dishes.some(d => d.name === name)) { this.showToast(`「${name}」已存在`); return; }
+
+        const newDish = { id:'d'+Date.now(), name, category:cat, icon, spice:this.selectedSpice, note };
+        if (this.addImageData) newDish.image = this.addImageData;
+
+        this.dishes.push(newDish);
+        this.saveDishes();
+        this.renderCategoryFilter();
+        this.renderMenuList();
+        this.updateStats();
+        this.closeAddModal();
+        this.showToast(`「${name}」添加成功！`);
+      }
+
+      /* --- 编辑弹窗 --- */
+      openEditModal(id) {
+        const d = this.dishes.find(x => x.id === id);
+        if (!d) return;
+        document.getElementById('editId').value     = d.id;
+        document.getElementById('editName').value    = d.name;
+        document.getElementById('editCategory').value = d.category;
+        document.getElementById('editIcon').value     = d.icon||'🍜';
+        document.getElementById('editNote').value     = d.note||'';
+        document.querySelectorAll('#editSpiceOptions .spice-option').forEach(b=>{
+          b.classList.toggle('selected', b.dataset.value === d.spice);
+        });
+        this.editSpice = d.spice||'';
+
+        // 图片
+        this.editImageData = d.image || '';
+        const area = document.getElementById('editImageUpload');
+        const preview = document.getElementById('editImagePreview');
+        if (d.image) {
+          preview.src = d.image;
+          preview.style.display = 'block';
+          area.classList.add('has-image');
+        } else {
+          preview.src = '';
+          preview.style.display = 'none';
+          area.classList.remove('has-image');
+        }
+
+        document.getElementById('editModal').classList.add('active');
+      }
+
+      closeEditModal(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('editModal').classList.remove('active');
+      }
+
+      selectEditSpice(btn) {
+        document.querySelectorAll('#editSpiceOptions .spice-option').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        this.editSpice = btn.dataset.value;
+      }
+
+      saveEdit(e) {
+        e.preventDefault();
+        const id    = document.getElementById('editId').value;
+        const name  = document.getElementById('editName').value.trim();
+        const cat   = document.getElementById('editCategory').value;
+        const icon  = document.getElementById('editIcon').value;
+        const note  = document.getElementById('editNote').value.trim();
+        if (!name || !cat) { this.showToast('请填写必填项'); return; }
+        if (this.dishes.some(d => d.name===name && d.id!==id)) { this.showToast(`「${name}」已存在`); return; }
+        const idx = this.dishes.findIndex(d => d.id===id);
+        if (idx >= 0) {
+          const updated = { ...this.dishes[idx], name, category:cat, icon, spice:this.editSpice, note };
+          if (this.editImageData) updated.image = this.editImageData;
+          else delete updated.image;
+          this.dishes[idx] = updated;
+          this.saveDishes();
+          this.renderMenuList();
+          this.renderCategoryFilter();
+          this.closeEditModal();
+          this.showToast('修改成功！');
+        }
+      }
+
+      /* --- 删除 --- */
+      deleteDish(id) {
+        const d = this.dishes.find(x => x.id === id);
+        if (!d) return;
+        if (!confirm(`确定要删除「${d.name}」吗？`)) return;
+        this.dishes = this.dishes.filter(x => x.id !== id);
+        this.saveDishes();
+        this.renderMenuList();
+        this.renderCategoryFilter();
+        this.updateStats();
+        this.showToast(`「${d.name}」已删除`);
+      }
+
+      /* ========== 幸运轮盘 ========== */
+      openWheel() {
+        const pool = this.getFiltered();
+        if (pool.length < 2) { this.showToast('当前分类下菜品太少，无法启动轮盘'); return; }
+        const n = Math.min(pool.length, 6 + Math.floor(Math.random()*3));
+        this.wheelDishes = this.shuffle([...pool]).slice(0, n);
+        this.renderWheel();
+        document.getElementById('wheelResult').textContent = '';
+        document.getElementById('spinBtn').textContent = '开始旋转';
+        document.getElementById('wheelModal').classList.add('active');
+      }
+
+      closeWheel(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('wheelModal').classList.remove('active');
+      }
+
+      renderWheel() {
+        const wheel = document.getElementById('wheel');
+        const n = this.wheelDishes.length;
+        const colors = ['#FFB347','#FFA726','#FFCC80','#FF8A65','#FFAB91','#F48FB1','#CE93D8','#FFCCBC'];
+        const step = 360 / n;
+
+        let html = '';
+        this.wheelDishes.forEach((dish, i) => {
+          const deg = i * step;
+          const bg   = colors[i % colors.length];
+          const halfStep = step / 2;
+          const imgHtml = dish.image
+            ? `<img src="${dish.image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+            : (dish.icon||'🍽️');
+          html += `
+            <div class="wheel-segment" style="transform: rotate(${deg}deg); background: ${bg};">
+              <div class="wheel-segment-inner" style="transform: rotate(${halfStep}deg); background: rgba(255,255,255,0.25);">
+                ${imgHtml}
+              </div>
+              <div class="wheel-segment-label" style="transform: rotate(${halfStep}deg);">${dish.name}</div>
+            </div>
+          `;
+        });
+
+        wheel.innerHTML = html;
+        wheel.style.transform = 'rotate(0deg)';
+
+        const prev = document.getElementById('wheelPreview');
+        prev.innerHTML = this.wheelDishes.map(d => {
+          const img = d.image ? `<img src="${d.image}">` : `<span>${d.icon||'🍽️'}</span>`;
+          return `<div class="wheel-preview-item">${img}${d.name}</div>`;
+        }).join('');
+      }
+
+      spinWheel() {
+        if (this.isSpinning) return;
+        this.isSpinning = true;
+        const btn = document.getElementById('spinBtn');
+        btn.disabled = true;
+        btn.textContent = '旋转中...';
+        document.getElementById('wheelResult').textContent = '';
+
+        const wheel = document.getElementById('wheel');
+        const n = this.wheelDishes.length;
+        const step = 360 / n;
+        const winner = Math.floor(Math.random()*n);
+        const spins = 5 + Math.floor(Math.random()*3);
+        const finalDeg = spins*360 + (360 - winner*step - step/2);
+
+        wheel.style.transform = `rotate(${finalDeg}deg)`;
+
+        setTimeout(() => {
+          const w = this.wheelDishes[winner];
+          this.currentDish = w;
+          document.getElementById('wheelResult').textContent = `🎉 结果：${w.name}！`;
+          this.addToHistory(w);
+          document.getElementById('shareBar').style.display = 'flex';
+          this.renderDishDisplay(w);
+          this.showToast(`轮盘选中：${w.name}！`);
+          this.isSpinning = false;
+          btn.disabled = false;
+          btn.textContent = '再转一次';
+        }, 4200);
+      }
+
+      /* ========== 工具 ========== */
+      updateStats() {
+        document.getElementById('statTotal').textContent     = this.dishes.length;
+        document.getElementById('statCategories').textContent = new Set(this.dishes.map(d=>d.category)).size;
+        document.getElementById('statToday').textContent     = this.history.length;
+      }
+
+      shuffle(arr) {
+        for (let i=arr.length-1; i>0; i--) {
+          const j = Math.floor(Math.random()*(i+1));
+          [arr[i],arr[j]] = [arr[j],arr[i]];
+        }
+        return arr;
+      }
+
+      showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(()=>t.classList.remove('show'), 2500);
+      }
+    }
+
+    const app = new App();
+  </script>
+</body>
+</html>
