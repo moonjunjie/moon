@@ -3,7 +3,7 @@
 这是一个可以直接在浏览器中运行的参考文献格式转换网页。
 启用 GitHub Pages 后，请在这里填写你的在线网址：
 
-`https://moon.github.io/moonjunjie/
+[`https://moon.github.io/moonjunjie/](https://moonjunjie.github.io/moon/)
 
 
 ## 功能
