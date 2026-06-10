@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联网参考文献自动排版工具 V10</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#64748b;--line:#dbe3ee;--primary:#2563eb;--primary2:#1d4ed8;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--blue:#eff6ff;--green:#f0fdf4;--yellow:#fffbeb;--red:#fef2f2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",Arial,sans-serif}
+.wrap{max-width:1220px;margin:0 auto;padding:26px 18px 54px}.head{margin-bottom:16px}h1{margin:0 0 8px;font-size:28px}h2{margin:0 0 12px;font-size:18px}p{margin:6px 0;line-height:1.65}.muted{font-size:14px;color:var(--muted)}
+.card{margin-top:16px;padding:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 18px rgba(15,23,42,.05)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:860px){.grid{grid-template-columns:1fr}}
+label{display:block;margin:8px 0 7px;font-size:14px;font-weight:700}textarea,input{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:var(--text);font:inherit;outline:none}
+textarea:focus,input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}textarea{min-height:158px;resize:vertical;line-height:1.55}#sourceText{min-height:265px}#outputText{min-height:230px}.small{max-width:112px}
+.help{padding:12px 14px;border-radius:10px;background:var(--blue);color:#1e3a8a;font-size:14px;line-height:1.7}
+.opts,.buttons{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-top:13px}.check{display:inline-flex;align-items:center;gap:7px;margin:0;font-weight:500}.check input{width:auto}
+button{appearance:none;padding:10px 15px;border:1px solid transparent;border-radius:9px;font:inherit;font-weight:700;cursor:pointer;transition:.15s}button:hover{transform:translateY(-1px)}button:disabled{opacity:.58;cursor:not-allowed;transform:none}
+.primary{background:var(--primary);color:#fff}.primary:hover{background:var(--primary2)}.secondary{background:var(--blue);border-color:#bfdbfe;color:#1e3a8a}.plain{background:#f8fafc;border-color:#cbd5e1;color:#334155}
+.status{display:none;margin-top:13px;padding:11px 12px;border-radius:9px;font-size:14px;line-height:1.6}.status.info{display:block;background:var(--blue);color:#1e40af}.status.ok{display:block;background:var(--green);color:var(--ok)}.status.warn{display:block;background:var(--yellow);color:var(--warn)}.status.error{display:block;background:var(--red);color:var(--bad)}
+.preview{margin-top:11px;padding:10px 12px;border:1px dashed #93c5fd;border-radius:9px;background:#f8fbff;font-family:Consolas,monospace;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+details{margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}summary{cursor:pointer;font-weight:700;color:#334155}.table-wrap{overflow-x:auto;margin-top:12px}table{width:100%;min-width:900px;border-collapse:collapse;font-size:13px}th,td{padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}th{background:#f8fafc;color:#475569;white-space:nowrap}
+.tag{display:inline-block;padding:3px 7px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}.tag.ok{color:var(--ok);background:var(--green)}.tag.warn{color:var(--warn);background:var(--yellow)}.tag.error{color:var(--bad);background:var(--red)}
+code{padding:1px 5px;border-radius:5px;background:#eef2ff;color:#3730a3}.single-output{min-height:116px}
+.single-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+.single-query-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.85fr);gap:16px;align-items:start}
+.candidate-box{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}
+.candidate-box h3{margin:0 0 6px;font-size:16px}
+.candidate-note{margin:0 0 10px;color:var(--muted);font-size:13px;line-height:1.6}
+.candidate-table{min-width:1120px}
+.candidate-table td{line-height:1.5}
+.candidate-title{min-width:260px}
+.candidate-authors{min-width:190px}
+.candidate-source{white-space:nowrap}
+.select-candidate-btn{white-space:nowrap}
+.hidden{display:none !important}
+.single-hints-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.single-hints-grid .full{grid-column:1 / -1}
+@media(max-width:860px){.single-query-grid{grid-template-columns:1fr}.single-hints-grid{grid-template-columns:1fr}.single-hints-grid .full{grid-column:auto}}
+.result-label{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mini{padding:7px 11px;font-size:13px}
+.footer{margin-top:18px;color:var(--muted);font-size:13px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>联网参考文献自动排版工具 V10</h1>
+    <p class="muted">双击网页文件即可使用。无需 Python，无需终端。粘贴一条正确示例，工具会自动识别目标格式、作者标点和题名大小写。</p>
+  </div>
+
+  <div class="help">
+    <strong>你只需要做三步：</strong>
+    ① 在左侧粘贴一条已经排版正确的标准参考文献；
+    ② 在右侧粘贴需要修改的文献；
+    ③ 点击“识别格式并联网转换”。
+    页面会自动推断格式，并从 Crossref 公开接口补充作者、DOI 和期刊信息。
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <h2>1. 粘贴一条标准参考文献</h2>
+        <label for="styleExample">目标格式示例</label>
+        <textarea id="styleExample"></textarea>
+        <div class="buttons">
+          <button id="detectBtn" class="secondary">识别示例格式</button>
+        </div>
+        <div id="styleStatus" class="status"></div>
+
+        <label>自动识别结果</label>
+        <div id="templatePreview" class="preview">尚未识别。点击“识别示例格式”，或者直接开始转换。</div>
+
+        <details>
+          <summary>高级设置：检查或微调自动识别模板</summary>
+          <p class="muted">
+            通常无需修改。占位符包括
+            <code>{{index}}</code>、<code>{{authors}}</code>、<code>{{year}}</code>、
+            <code>{{title}}</code>、<code>{{journal}}</code>、<code>{{location}}</code>、
+            <code>{{doi_url}}</code>。
+          </p>
+          <textarea id="advancedTemplate" style="min-height:125px"></textarea>
+
+          <label for="journalMap">期刊缩写替换规则</label>
+          <p class="muted">每行填写：完整期刊名 = 目标缩写。可自行增加。</p>
+          <textarea id="journalMap" style="min-height:130px">Journal of Manufacturing Systems = J Manuf Sys
+Applied Sciences = Appl Sci
+Procedia CIRP = Procedia CIRP</textarea>
+        </details>
+
+        <label for="email">Crossref 联系邮箱（可选）</label>
+        <input id="email" type="email">
+
+        <div class="opts">
+          <label class="check"><input id="preserveNumber" type="checkbox" checked> 保留原始编号</label>
+          <label class="check"><input id="keepLowConfidence" type="checkbox" checked> 低置信度条目保留原文</label>
+          <label class="check">起始编号：<input id="startNumber" class="small" type="number" min="1" value="1"></label>
+        </div>
+      </div>
+
+      <div>
+        <h2>2. 粘贴需要修改的参考文献</h2>
+        <label for="sourceText">待修改文献</label>
+        <textarea id="sourceText"></textarea>
+
+        <div class="buttons">
+          <button id="convertBtn" class="primary">识别格式并联网转换</button>
+          <button id="testBtn" class="secondary">测试联网</button>
+          <button id="sampleBtn" class="plain">填入示例</button>
+          <button id="clearBtn" class="plain">清空</button>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. 转换结果</h2>
+    <textarea id="outputText"></textarea>
+    <div class="buttons">
+      <button id="copyBtn" class="secondary">复制全部结果</button>
+      <button id="downloadBtn" class="plain">下载 TXT</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. 通过题名或 DOI 生成三种常用格式</h2>
+    <p class="muted">输入一篇论文的完整题名或 DOI，点击按钮后会同时查询 Crossref、OpenAlex 和 Semantic Scholar；填写 DOI 时还会使用 DataCite 兜底，并生成 GB/T 7714—2015、APA 7 和 IEEE 三种格式。</p>
+
+    <div class="single-query-grid">
+      <div>
+        <label for="singleQuery">论文题名或 DOI</label>
+        <textarea id="singleQuery" style="min-height:146px"></textarea>
+      </div>
+
+      <div>
+        <p class="muted">以下信息均为可选项。匹配度较低时，补充其中任意一项即可提高检索准确率。</p>
+        <div class="single-hints-grid">
+          <div class="full">
+            <label for="singleAuthor">作者</label>
+            <input id="singleAuthor" type="text">
+          </div>
+          <div>
+            <label for="singleYear">年份</label>
+            <input id="singleYear" type="text" inputmode="numeric">
+          </div>
+          <div>
+            <label for="singleDoi">DOI</label>
+            <input id="singleDoi" type="text">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="singleGenerateBtn" class="primary">联网查找并生成三种格式</button>
+      <button id="singleClearBtn" class="plain">清空三种格式</button>
+      <button id="copyAllStylesBtn" class="secondary">复制三种格式</button>
+    </div>
+
+    <div id="singleStatus" class="status"></div>
+
+    <div id="candidateBox" class="candidate-box hidden">
+      <h3>候选文献列表</h3>
+      <p class="candidate-note">
+        只输入题名时，即使匹配度不高，也会显示多个候选结果。请根据题名、作者、年份、期刊和 DOI 选择正确文献。
+      </p>
+      <div class="table-wrap">
+        <table class="candidate-table">
+          <thead>
+            <tr>
+              <th>选择</th>
+              <th>匹配度</th>
+              <th>数据来源</th>
+              <th>题名</th>
+              <th>作者</th>
+              <th>年份</th>
+              <th>期刊</th>
+              <th>DOI</th>
+            </tr>
+          </thead>
+          <tbody id="candidateRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="single-grid">
+      <div>
+        <div class="result-label">
+          <label for="gbtOutput">GB/T 7714—2015</label>
+          <button class="plain mini copy-style-btn" data-target="gbtOutput">复制</button>
+        </div>
+        <textarea id="gbtOutput" class="single-output"></textarea>
+      </div>
+
+      <div>
+        <div class="result-label">
+          <label for="apaOutput">APA 7</label>
+          <button class="plain mini copy-style-btn" data-target="apaOutput">复制</button>
+        </div>
+        <textarea id="apaOutput" class="single-output"></textarea>
+      </div>
+
+      <div>
+        <div class="result-label">
+          <label for="ieeeOutput">IEEE</label>
+          <button class="plain mini copy-style-btn" data-target="ieeeOutput">复制</button>
+        </div>
+        <textarea id="ieeeOutput" class="single-output"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>联网匹配检查表</h2>
+    <p class="muted">黄色和红色条目需要重点检查。工具会从 Crossref、OpenAlex 和 Semantic Scholar 中选择匹配度最高的结果；填写 DOI 时还会使用 DataCite 兜底。工具不会在低置信度情况下擅自编造 DOI。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>编号</th><th>状态</th><th>匹配度</th><th>检索到的题名</th><th>DOI</th><th>备注</th></tr></thead>
+        <tbody id="resultRows"><tr><td colspan="6" class="muted">尚未开始转换。</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    数据来源：Crossref、OpenAlex、Semantic Scholar 和 DataCite 的公开接口。网页仅在浏览器中运行，不会把文献发送到自建服务器。
+    自动识别适合常见的期刊论文格式，并会根据标准示例判断期刊缩写是否保留句点；如果示例格式非常特殊，可在“高级设置”中微调识别后的模板。单篇查询区域可根据题名或 DOI 生成 GB/T 7714—2015、APA 7 和 IEEE 三种常用格式；作者、年份和 DOI 可作为可选辅助条件。中文题名会使用额外的中文片段相似度计算，提高匹配准确率。仅凭题名检索且匹配度不高时，页面会列出多个候选结果，供人工选择。
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const API="https://api.crossref.org/v1";
+const OPENALEX_API="https://api.openalex.org";
+const S2_API="https://api.semanticscholar.org/graph/v1";
+const DATACITE_API="https://api.datacite.org";
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let styleConfig=null;
+let singleCandidateItems=[];
+
+function clean(v){return String(v??"").replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim()}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function trimP(v){return clean(v).replace(/[.,;:\s]+$/g,"")}
+function setStatus(msg,type="info"){const x=$("status");x.className="status "+type;x.textContent=msg}
+function setStyleStatus(msg,type="info"){const x=$("styleStatus");x.className="status "+type;x.textContent=msg}
+
+function parseEntries(text){
+ const lines=String(text||"").split(/\r?\n/),out=[];let cur=null;
+ for(const raw of lines){const line=raw.trim();if(!line)continue;const m=line.match(/^\s*\[(\d+)\]\s*(.*)$/);
+  if(m){if(cur)out.push(cur);cur={originalNumber:Number(m[1]),raw:m[2].trim(),originalLine:line}}
+  else if(cur){cur.raw+=" "+line;cur.originalLine+=" "+line}
+  else out.push({originalNumber:null,raw:line,originalLine:line});
+ }
+ if(cur)out.push(cur);return out;
+}
+
+function extractDoi(text){const m=String(text||"").match(/10\.\d{4,9}\/[-._;()/:A-Z0-9]+/i);return m?m[0].replace(/[.,;)\]]+$/g,""):""}
+function tokens(text){
+ const stop=new Set(["a","an","the","of","for","and","or","to","in","on","with","using","through","during","by","from","et","al","vol","no"]);
+ const chunks=clean(text).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g," ").split(/\s+/).filter(Boolean);
+ const out=[];
+ for(const chunk of chunks){
+  if(/^[\u4e00-\u9fa5]+$/.test(chunk)){
+   if(chunk.length<=2){out.push(chunk);continue;}
+   out.push(chunk);
+   for(let i=0;i<chunk.length-1;i++)out.push(chunk.slice(i,i+2));
+  }else if(chunk.length>1&&!stop.has(chunk)){
+   out.push(chunk);
+  }
+ }
+ return [...new Set(out)];
+}
+function yearOf(item){for(const p of [item?.published?.["date-parts"],item?.["published-print"]?.["date-parts"],item?.["published-online"]?.["date-parts"],item?.issued?.["date-parts"],item?.created?.["date-parts"]]){const y=p?.[0]?.[0];if(y)return String(y)}return""}
+function confidence(raw,item){const title=clean(item?.title?.[0]||"");if(!title)return 0;const rt=new Set(tokens(raw)),tt=tokens(title);if(!tt.length)return 0;const overlap=tt.filter(t=>rt.has(t)).length/tt.length;const y=yearOf(item);const yb=y&&String(raw).includes(y)?1:0;const fam=clean(item?.author?.[0]?.family||"").toLowerCase();const ab=fam&&clean(raw).toLowerCase().includes(fam)?1:0;const doi=clean(item?.DOI||"");const db=doi&&clean(raw).toLowerCase().includes(doi.toLowerCase())?1:0;return Math.max(0,Math.min(1,.68*overlap+.14*yb+.10*ab+.08*db))}
+function choose(raw,items){return (items||[]).map(item=>({item,confidence:confidence(raw,item)})).sort((a,b)=>b.confidence-a.confidence)[0]||null}
+
+function addParams(base,path,params={}){
+ const u=new URL(base+path),mail=$("email").value.trim();
+ if(mail&&(base===API||base===OPENALEX_API))u.searchParams.set("mailto",mail);
+ for(const[k,v]of Object.entries(params))if(v!==""&&v!=null)u.searchParams.set(k,v);
+ return u.toString();
+}
+function apiUrl(path,params={}){return addParams(API,path,params)}
+function openAlexUrl(path,params={}){return addParams(OPENALEX_API,path,params)}
+function s2Url(path,params={}){return addParams(S2_API,path,params)}
+function dataCiteUrl(path,params={}){return addParams(DATACITE_API,path,params)}
+async function fetchJson(url,label="数据源"){
+ let r;
+ try{r=await fetch(url)}
+ catch(e){throw new Error("浏览器无法访问 "+label+"。请确认网络正常，并优先使用 Chrome 或 Edge。")}
+ if(!r.ok){
+  if(r.status===429)throw new Error(label+" 请求过于频繁，请稍后重试。");
+  throw new Error(label+" 返回 HTTP "+r.status+"。");
+ }
+ return r.json();
+}
+function nameToAuthor(name){
+ const value=clean(name);
+ if(!value)return{family:"",given:""};
+ if(/^[\u4e00-\u9fa5·]{2,}$/.test(value))return{family:value,given:""};
+ if(value.includes(",")){const parts=value.split(",");return{family:clean(parts[0]),given:clean(parts.slice(1).join(" "))}}
+ const parts=value.split(/\s+/).filter(Boolean);
+ if(parts.length===1)return{family:parts[0],given:""};
+ return{family:parts[parts.length-1],given:parts.slice(0,-1).join(" ")};
+}
+function issuedYear(year){return year?{"date-parts":[[Number(year)]]}:undefined}
+function stripDoiUrl(value){return clean(value).replace(/^https?:\/\/(?:dx\.)?doi\.org\//i,"")}
+function normaliseOpenAlex(work){
+ const b=work?.biblio||{},first=clean(b.first_page||""),last=clean(b.last_page||"");
+ const page=first&&last&&first!==last?first+"-"+last:(first||last);
+ const source=work?.primary_location?.source?.display_name||work?.locations?.find(x=>x?.source?.display_name)?.source?.display_name||"";
+ return{
+  title:[clean(work?.title||work?.display_name||"")],
+  author:(work?.authorships||[]).map(a=>nameToAuthor(a?.author?.display_name||a?.raw_author_name||"")),
+  issued:issuedYear(work?.publication_year),
+  volume:clean(b.volume||""),
+  issue:clean(b.issue||""),
+  page,
+  DOI:stripDoiUrl(work?.doi||""),
+  "container-title":[clean(source)],
+  _source:"OpenAlex"
+ };
+}
+function normaliseS2(paper){
+ const journal=paper?.journal||{};
+ return{
+  title:[clean(paper?.title||"")],
+  author:(paper?.authors||[]).map(a=>nameToAuthor(a?.name||"")),
+  issued:issuedYear(paper?.year),
+  volume:clean(journal?.volume||""),
+  issue:clean(journal?.issue||""),
+  page:clean(journal?.pages||""),
+  DOI:clean(paper?.externalIds?.DOI||""),
+  "container-title":[clean(journal?.name||paper?.venue||"")],
+  _source:"Semantic Scholar"
+ };
+}
+function normaliseDataCite(payload){
+ const a=payload?.data?.attributes||payload?.attributes||{};
+ const container=a.container||{};
+ return{
+  title:[clean(a?.titles?.[0]?.title||"")],
+  author:(a?.creators||[]).map(c=>({family:clean(c.familyName||c.name||""),given:clean(c.givenName||"")})),
+  issued:issuedYear(a.publicationYear),
+  volume:clean(container.volume||""),
+  issue:clean(container.issue||""),
+  page:clean(container.firstPage&&container.lastPage?container.firstPage+"-"+container.lastPage:container.firstPage||container.lastPage||""),
+  DOI:clean(a.doi||""),
+  "container-title":[clean(container.title||a.publisher||"")],
+  _source:"DataCite"
+ };
+}
+function withSource(item,source){if(item)item._source=item._source||source;return item}
+async function crossrefDoi(doi){const d=await fetchJson(apiUrl("/works/"+encodeURIComponent(doi)),"Crossref");return withSource(d?.message||null,"Crossref")}
+async function crossrefSearch(query,extra={}){const d=await fetchJson(apiUrl("/works",{"query.bibliographic":query,rows:"8",...extra}),"Crossref");return(d?.message?.items||[]).map(x=>withSource(x,"Crossref"))}
+async function openAlexDoi(doi){const d=await fetchJson(openAlexUrl("/works",{filter:"doi:https://doi.org/"+doi,"per-page":"1"}),"OpenAlex");return(d?.results||[]).map(normaliseOpenAlex)[0]||null}
+async function openAlexSearch(query,year=""){const params={search:query,"per-page":"10"};if(/^\d{4}$/.test(clean(year)))params.filter="publication_year:"+clean(year);const d=await fetchJson(openAlexUrl("/works",params),"OpenAlex");return(d?.results||[]).map(normaliseOpenAlex)}
+async function s2Doi(doi){const fields="title,authors,year,venue,journal,externalIds";const d=await fetchJson(s2Url("/paper/DOI:"+encodeURIComponent(doi),{fields}),"Semantic Scholar");return normaliseS2(d)}
+async function s2Search(query,year=""){const fields="title,authors,year,venue,journal,externalIds";const params={query,limit:"10",fields};if(/^\d{4}$/.test(clean(year)))params.year=clean(year);const d=await fetchJson(s2Url("/paper/search",params),"Semantic Scholar");return(d?.data||[]).map(normaliseS2)}
+async function dataCiteDoi(doi){const d=await fetchJson(dataCiteUrl("/dois/"+doi),"DataCite");return normaliseDataCite(d)}
+async function firstSuccessfulDoi(doi){
+ const tasks=[
+  ["Crossref",()=>crossrefDoi(doi)],
+  ["DataCite",()=>dataCiteDoi(doi)],
+  ["OpenAlex",()=>openAlexDoi(doi)],
+  ["Semantic Scholar",()=>s2Doi(doi)]
+ ];
+ for(const[source,fn]of tasks){
+  try{const item=await fn();if(item&&clean(item?.title?.[0]||""))return{item,source}}catch(e){}
+ }
+ return null;
+}
+async function collectSearchCandidates(query,year=""){
+ const settled=await Promise.allSettled([
+  crossrefSearch(query),
+  openAlexSearch(query,year),
+  s2Search(query,year)
+ ]);
+ const all=[];
+ for(const result of settled)if(result.status==="fulfilled")all.push(...result.value);
+ return all;
+}
+async function lookup(raw){
+ const doi=extractDoi(raw);
+ if(doi){
+  const exact=await firstSuccessfulDoi(doi);
+  if(exact)return{item:exact.item,confidence:1,method:"多源 DOI 精确检索",note:"数据来源："+exact.source+"。原文中已有 DOI。"};
+ }
+ const items=await collectSearchCandidates(raw);
+ const best=choose(raw,items);
+ return best?{item:best.item,confidence:best.confidence,method:"多源题录检索",note:"数据来源："+(best.item?._source||"未知")+"。已从 Crossref、OpenAlex 和 Semantic Scholar 候选中选择相似度最高的一条。"}:{item:null,confidence:0,method:"多源题录检索",note:"多个公开数据源均未找到候选记录。"};
+}
+
+function initials(given,style){
+ const letters=clean(given).replace(/[.'’`]/g,"").split(/[\s-]+/).filter(Boolean).map(x=>x.charAt(0).toUpperCase());
+ if(style.initialPeriods)return letters.map(x=>x+".").join(style.initialSpaces?" ":"");
+ return letters.join(style.initialSpaces?" ":"");
+}
+function detectAuthorStyle(authorText){
+ const text=clean(authorText);
+ /*
+   Only treat a comma as a family-name/initial separator when the comma is
+   followed by initials and then by the end of one author. This avoids
+   mistaking the author-list comma in "Kubota T, Hamzeh R, Xu X" for the
+   surname-initial format "Kubota, T".
+ */
+ const familyComma=/^[^,;]+,\s*[A-Z](?:\.?(?:\s*[A-Z]\.?)*)?(?=\s*(?:[,;]|\band\b|$))/.test(text);
+ return{
+  separator:text.includes(";")?"; ":", ",
+  useAnd:/\sand\s/i.test(text),
+  initialPeriods:/\b[A-Z]\./.test(text),
+  initialSpaces:/\b[A-Z]\.?\s+[A-Z]\.?/.test(text),
+  familyComma
+ };
+}
+function detectTitleStyle(titleText){
+ const words=clean(titleText).match(/[A-Za-z][A-Za-z0-9-]*/g)||[];
+ const laterWords=words.slice(1);
+ const laterCapitalised=laterWords.filter(word=>/^[A-Z]/.test(word)).length;
+ /*
+   A standard example such as "Step-nc enabled machine tool digital twin"
+   is sentence case: the title starts with an upper-case letter and almost
+   all later words start with lower-case letters.
+ */
+ const sentenceCase=words.length>0 && /^[A-Z]/.test(words[0]) &&
+   laterCapitalised<=Math.max(1,Math.floor(laterWords.length*0.15));
+ return{sentenceCase};
+}
+function applyTitleStyle(title,titleStyle){
+ const value=trimP(title);
+ if(!titleStyle?.sentenceCase)return value;
+ const lower=value.toLowerCase();
+ return lower.replace(/[a-z\u00c0-\u024f]/,letter=>letter.toUpperCase());
+}
+function detectJournalStyle(journalText){
+ const value=clean(journalText);
+ return{
+  keepPeriods:/\./.test(value)
+ };
+}
+function applyJournalStyle(journal,journalStyle){
+ let value=clean(journal);
+ if(!journalStyle?.keepPeriods){
+  value=value.replace(/\./g,"").replace(/\s+/g," ").trim();
+ }
+ return value;
+}
+function formatAuthors(authors,st){
+ if(!Array.isArray(authors)||!authors.length)return"";
+ const arr=authors.map(a=>{const f=clean(a.family||a.name||""),i=initials(a.given||"",st);return st.familyComma?(f+(i?", "+i:"")):(f+(i?" "+i:""))}).filter(Boolean);
+ if(st.useAnd&&arr.length>1)return arr.length===2?arr.join(" and "):arr.slice(0,-1).join(st.separator)+" and "+arr[arr.length-1];
+ return arr.join(st.separator);
+}
+
+function replaceBySpans(text,spans){
+ let out=text;for(const s of spans.filter(s=>s&&s.start>=0&&s.end>s.start).sort((a,b)=>b.start-a.start))out=out.slice(0,s.start)+s.value+out.slice(s.end);return out;
+}
+function inferStyle(example){
+ const text=String(example||"").trim();if(!text)throw new Error("请先在左侧粘贴一条标准参考文献。");
+ const spans=[];let bodyStart=0;
+ const idx=text.match(/^\s*(?:\[(\d+)\]|\((\d+)\)|(\d+)[.)])\s*/);
+ if(idx){const digits=(idx[1]||idx[2]||idx[3]),pos=idx.index+idx[0].indexOf(digits);spans.push({start:pos,end:pos+digits.length,value:"{{index}}"});bodyStart=idx[0].length}
+ const ym=text.slice(bodyStart).match(/\b(?:19|20)\d{2}\b/);if(!ym)throw new Error("没有识别到四位年份，请换一条包含年份的标准文献。");
+ const yearStart=bodyStart+ym.index,yearEnd=yearStart+ym[0].length;
+ spans.push({start:yearStart,end:yearEnd,value:"{{year}}"});
+ let authorEnd=yearStart;while(authorEnd>bodyStart&&/[ \t(]/.test(text[authorEnd-1]))authorEnd--;
+ const authorStart=bodyStart;const authorText=text.slice(authorStart,authorEnd).trim();
+ if(!authorText)throw new Error("没有识别到作者区域。");
+ const authorLead=text.slice(authorStart,authorEnd).indexOf(authorText);
+ spans.push({start:authorStart+authorLead,end:authorStart+authorLead+authorText.length,value:"{{authors}}"});
+
+ const doiFull=text.match(/https?:\/\/(?:dx\.)?doi\.org\/10\.\d{4,9}\/[-._;()/:A-Z0-9]+/i);
+ const doiBare=!doiFull?text.match(/10\.\d{4,9}\/[-._;()/:A-Z0-9]+/i):null;
+ const doiMatch=doiFull||doiBare;
+ let contentEnd=doiMatch?doiMatch.index:text.length;
+ if(doiMatch)spans.push({start:doiMatch.index,end:doiMatch.index+doiMatch[0].replace(/[.,;]+$/,"").length,value:doiFull?"{{doi_url}}":"{{doi}}"});
+
+ let titleStart=yearEnd;while(titleStart<contentEnd&&/[\s),.;:]/.test(text[titleStart]))titleStart++;
+ let area=text.slice(titleStart,contentEnd).replace(/\s+$/,"");
+ let areaEnd=titleStart+area.length;
+ let locSpan=null;
+ const loc=area.match(/(\b\d+\s*(?:\(\s*[^)]+\s*\))?\s*:\s*[A-Za-z0-9]+(?:\s*[-–—]\s*[A-Za-z0-9]+)?|\b\d+\s*(?:\(\s*[^)]+\s*\))?\s*,\s*[A-Za-z0-9]+(?:\s*[-–—]\s*[A-Za-z0-9]+)?)(?=\s*[.,;]?\s*$)/);
+ if(loc){locSpan={start:titleStart+loc.index,end:titleStart+loc.index+loc[0].length,value:"{{location}}"};spans.push(locSpan)}
+ const splitEnd=locSpan?locSpan.start:areaEnd;
+ const beforeLoc=text.slice(titleStart,splitEnd);
+ const delimiter=beforeLoc.indexOf(". ");
+ let titleEnd,journalStart,journalEnd;
+ if(delimiter>=0){titleEnd=titleStart+delimiter;journalStart=titleEnd+2;while(journalStart<splitEnd&&/\s/.test(text[journalStart]))journalStart++;journalEnd=splitEnd;while(journalEnd>journalStart&&/[\s.,;]/.test(text[journalEnd-1]))journalEnd--}
+ else{titleEnd=splitEnd;journalStart=-1;journalEnd=-1}
+ if(titleEnd>titleStart)spans.push({start:titleStart,end:titleEnd,value:"{{title}}"});
+ if(journalStart>=0&&journalEnd>journalStart)spans.push({start:journalStart,end:journalEnd,value:"{{journal}}"});
+ let template=replaceBySpans(text,spans);
+ template=template.replace(/\{\{doi_url\}\}[.,;]*$/,"{{doi_url}}.");
+ const titleText=titleEnd>titleStart?text.slice(titleStart,titleEnd):"";
+ const journalText=journalStart>=0&&journalEnd>journalStart?text.slice(journalStart,journalEnd):"";
+ return{template,authorStyle:detectAuthorStyle(authorText),titleStyle:detectTitleStyle(titleText),journalStyle:detectJournalStyle(journalText),rawExample:text};
+}
+function detectAndShow(){
+ try{styleConfig=inferStyle($("styleExample").value);$("advancedTemplate").value=styleConfig.template;const titleMode=styleConfig.titleStyle?.sentenceCase?"仅题名首字母大写":"保留数据库题名大小写";const journalMode=styleConfig.journalStyle?.keepPeriods?"期刊缩写保留句点":"期刊缩写去掉句点";$("templatePreview").textContent=styleConfig.template+"\n\n题名大小写："+titleMode+"\n期刊缩写："+journalMode;setStyleStatus("已自动识别目标格式。转换时会按照这条示例排版。","ok");return true}
+ catch(e){styleConfig=null;$("templatePreview").textContent="识别失败："+e.message;setStyleStatus("识别失败："+e.message,"error");return false}
+}
+
+function journalMap(){const m=new Map();for(const line of $("journalMap").value.split(/\r?\n/)){const p=line.indexOf("=");if(p<0)continue;const a=clean(line.slice(0,p)).toLowerCase(),b=clean(line.slice(p+1));if(a&&b)m.set(a,b)}return m}
+function journalOf(item,map){const full=clean(item?.["container-title"]?.[0]||""),short=clean(item?.["short-container-title"]?.[0]||"");if(full&&map.has(full.toLowerCase()))return map.get(full.toLowerCase());if(short&&map.has(short.toLowerCase()))return map.get(short.toLowerCase());return short||full}
+function locationOf(item){const v=clean(item?.volume||""),i=clean(item?.issue||""),p=clean(item?.page||item?.["article-number"]||"");const vi=v+(i?"("+i+")":"");return vi&&p?vi+":"+p:vi||p}
+function render(t,f){let out=String(t||"");for(const[k,v]of Object.entries(f))out=out.replace(new RegExp("\\{\\{"+k+"\\}\\}","g"),v??"");return out.replace(/[ \t]+/g," ").replace(/\s+([,;:.)])/g,"$1").replace(/\(\s*\)/g,"").replace(/\.\s*\./g,".").replace(/\s+\./g,".").trim()}
+function lineFor(index,look,map){
+ const i=look.item,doi=clean(i?.DOI||"");
+ return render($("advancedTemplate").value||styleConfig.template,{index:String(index),authors:formatAuthors(i?.author,styleConfig.authorStyle),year:yearOf(i),title:applyTitleStyle(i?.title?.[0]||"",styleConfig.titleStyle),journal:applyJournalStyle(journalOf(i,map),styleConfig.journalStyle),location:locationOf(i),volume:clean(i?.volume||""),issue:clean(i?.issue||""),pages:clean(i?.page||i?.["article-number"]||""),doi,doi_url:doi?"https://doi.org/"+doi:""});
+}
+function classify(c,item){if(!item)return{label:"未匹配",css:"error"};if(c>=.78)return{label:"可靠匹配",css:"ok"};if(c>=.58)return{label:"建议复核",css:"warn"};return{label:"低置信度",css:"error"}}
+function row(index,look){const st=classify(look.confidence,look.item);return`<tr><td>${esc(index)}</td><td><span class="tag ${st.css}">${esc(st.label)}</span></td><td>${esc(Math.round((look.confidence||0)*100)+"%")}</td><td>${esc(clean(look.item?.title?.[0]||"")||"—")}</td><td>${esc(clean(look.item?.DOI||"")||"—")}</td><td>${esc(look.method+"；"+look.note)}</td></tr>`}
+
+async function convert(){
+ const entries=parseEntries($("sourceText").value);if(!entries.length){setStatus("请先粘贴至少一条待修改文献。","warn");return}
+ if(!detectAndShow())return;
+ $("convertBtn").disabled=true;$("testBtn").disabled=true;$("resultRows").innerHTML="";$("outputText").value="";
+ const preserve=$("preserveNumber").checked,keepLow=$("keepLowConfidence").checked,start=Math.max(1,Number($("startNumber").value||1)),map=journalMap();
+ const lines=[];let ok=0,review=0,bad=0;
+ try{
+  for(let n=0;n<entries.length;n++){const e=entries[n],index=preserve&&e.originalNumber!==null?e.originalNumber:start+n;setStatus(`正在联网检索第 ${n+1}/${entries.length} 条文献，请稍候……`,"info");
+   let look;try{look=await lookup(e.raw)}catch(err){look={item:null,confidence:0,method:"联网失败",note:err.message}}
+   const st=classify(look.confidence,look.item),usable=look.item&&look.confidence>=.58;if(st.css==="ok")ok++;else if(st.css==="warn")review++;else bad++;
+   lines.push((usable||(look.item&&!keepLow))?lineFor(index,look,map):e.originalLine+"  [需人工复核]");
+   $("resultRows").insertAdjacentHTML("beforeend",row(index,look));$("outputText").value=lines.join("\n");if(n<entries.length-1)await sleep(280);
+  }
+  setStatus(`转换完成：共 ${entries.length} 条；可靠匹配 ${ok} 条；建议复核 ${review} 条；低置信度或失败 ${bad} 条。`,bad?"warn":"ok");
+ }finally{$("convertBtn").disabled=false;$("testBtn").disabled=false}
+}
+async function test(){
+ $("testBtn").disabled=true;
+ setStatus("正在测试多个公开数据源的联网连接……","info");
+ try{
+  const settled=await Promise.allSettled([
+   fetchJson(apiUrl("/works",{rows:"0"}),"Crossref"),
+   fetchJson(openAlexUrl("/works",{"per-page":"1"}),"OpenAlex"),
+   fetchJson(s2Url("/paper/search",{query:"digital twin",limit:"1",fields:"title"}),"Semantic Scholar")
+  ]);
+  const labels=["Crossref","OpenAlex","Semantic Scholar"];
+  const ok=[],bad=[];
+  settled.forEach((r,i)=>(r.status==="fulfilled"?ok:bad).push(labels[i]));
+  if(ok.length)setStatus("联网测试完成：可访问 "+ok.join("、")+(bad.length?"；暂时无法访问 "+bad.join("、")+"，程序会自动跳过不可用来源。":"。"),bad.length?"warn":"ok");
+  else setStatus("联网测试失败：当前无法访问公开文献数据源。请确认网络正常，并优先使用 Chrome 或 Edge。","error");
+ }finally{$("testBtn").disabled=false}
+}
+async function copyOut(){const t=$("outputText").value;if(!t){setStatus("当前没有可复制的结果。","warn");return}try{await navigator.clipboard.writeText(t);setStatus("结果已复制到剪贴板。","ok")}catch(e){$("outputText").focus();$("outputText").select();setStatus(document.execCommand("copy")?"结果已复制到剪贴板。":"复制失败，请在结果框内按 Ctrl+C。","warn")}}
+function download(){const t=$("outputText").value;if(!t){setStatus("当前没有可下载的结果。","warn");return}const b=new Blob([t],{type:"text/plain;charset=utf-8"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="formatted_references.txt";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);setStatus("TXT 文件已下载。","ok")}
+function sample(){ $("sourceText").value=`[118] Hao X, Li Y, Cheng Y, et al. A time-varying geometry modeling method for parts with deformation during the machining process. J Manuf Sys, 2020, 55: 15-29.
+[119] Zhu Z, Xi X, Xu X, et al. Digital twin-driven machining process for thin-walled part manufacturing. J Manuf Sys, 2021, 59: 453-466.
+[120] Heo E and Yoo N. Numerical control machine optimization technologies through analysis of machining history data using digital twin. Applied Sciences, 2021, 11(7): 3259.
+[121] Kubota T, Hamzeh R and Xu X. Step-nc enabled machine tool digital twin. Procedia Cirp, 2020, 93: 1460-1465.`;setStatus("示例已经填入。点击“识别格式并联网转换”即可测试。","info")}
+function clearAll(){$("sourceText").value="";$("outputText").value="";$("resultRows").innerHTML='<tr><td colspan="6" class="muted">尚未开始转换。</td></tr>';setStatus("内容已清空。","info")}
+
+function setSingleStatus(msg,type="info"){
+ const x=$("singleStatus");x.className="status "+type;x.textContent=msg;
+}
+function doiUrlOf(item){
+ const doi=clean(item?.DOI||"");
+ return doi?"https://doi.org/"+doi:"";
+}
+function normaliseDoiInput(value){
+ const doi=extractDoi(value);
+ return doi || clean(value).replace(/^https?:\/\/(?:dx\.)?doi\.org\//i,"").replace(/[.,;\s]+$/g,"");
+}
+function singleCandidateConfidence(titleQuery,authorHint,yearHint,item){
+ let score=confidence(titleQuery+" "+authorHint+" "+yearHint,item);
+ const title=clean(item?.title?.[0]||"").toLowerCase();
+ const authorText=(item?.author||[]).map(a=>clean((a.family||"")+" "+(a.given||""))).join(" ").toLowerCase();
+ const year=yearOf(item);
+ const authorTokens=tokens(authorHint);
+ const authorBonus=authorTokens.length?authorTokens.filter(t=>authorText.includes(t.toLowerCase())).length/authorTokens.length:0;
+ const yearBonus=yearHint&&year===clean(yearHint)?1:0;
+ const exactTitle=clean(titleQuery).toLowerCase();
+ const titleBonus=exactTitle&&title.includes(exactTitle)?1:0;
+ score=.68*score+.16*authorBonus+.10*yearBonus+.06*titleBonus;
+ return Math.max(0,Math.min(1,score));
+}
+function candidateDedupKey(item){
+ const doi=clean(item?.DOI||"").toLowerCase();
+ if(doi)return"doi:"+doi;
+ return"title:"+clean(item?.title?.[0]||"").toLowerCase()+"|year:"+yearOf(item);
+}
+function dedupeScoredCandidates(scored){
+ const seen=new Set(),out=[];
+ for(const entry of scored){
+  const key=candidateDedupKey(entry.item);
+  if(!key||seen.has(key))continue;
+  seen.add(key);
+  out.push(entry);
+ }
+ return out;
+}
+async function lookupSingleReference(titleQuery,authorHint,yearHint,doiHint){
+ const doi=normaliseDoiInput(doiHint||titleQuery);
+ if(doi){
+  const exact=await firstSuccessfulDoi(doi);
+  if(exact){
+   const entry={item:exact.item,confidence:1};
+   return{item:exact.item,confidence:1,candidates:[entry],method:"多源 DOI 精确检索",note:"数据来源："+exact.source+"。已优先使用 DOI 精确查询。"};
+  }
+  if(doiHint)throw new Error("填写的 DOI 没有在 Crossref、DataCite、OpenAlex 或 Semantic Scholar 中查询到记录，请检查 DOI 是否正确。");
+ }
+ const queryParts=[titleQuery,authorHint,yearHint].map(clean).filter(Boolean);
+ if(!queryParts.length)throw new Error("请至少填写题名、作者、年份或 DOI 中的一项。");
+ const query=queryParts.join(" ");
+ const extra={};
+ if(titleQuery)extra["query.title"]=titleQuery;
+ if(authorHint)extra["query.author"]=authorHint;
+ if(/^\d{4}$/.test(clean(yearHint)))extra.filter="from-pub-date:"+clean(yearHint)+"-01-01,until-pub-date:"+clean(yearHint)+"-12-31";
+ const settled=await Promise.allSettled([
+  crossrefSearch(query,extra),
+  openAlexSearch(query,yearHint),
+  s2Search(query,yearHint)
+ ]);
+ const items=[];
+ for(const result of settled)if(result.status==="fulfilled")items.push(...result.value);
+ const scored=dedupeScoredCandidates(
+  items.map(item=>({item,confidence:singleCandidateConfidence(titleQuery,authorHint,yearHint,item)}))
+       .sort((a,b)=>b.confidence-a.confidence)
+ ).slice(0,24);
+ const best=scored[0];
+ return best?{item:best.item,confidence:best.confidence,candidates:scored,method:"多源增强题录检索",note:"数据来源："+(best.item?._source||"未知")+"。题名、作者、年份等已共同参与匹配。"}:{item:null,confidence:0,candidates:[],method:"多源增强题录检索",note:"多个公开数据源均未找到候选记录。"};
+}
+function authorInitialLetters(given){
+ return clean(given).replace(/[.'’`]/g,"").split(/[\s-]+/).filter(Boolean).map(x=>x.charAt(0).toUpperCase());
+}
+function authorInitialsCompact(given){
+ return authorInitialLetters(given).join("");
+}
+function authorInitialsPeriods(given){
+ return authorInitialLetters(given).map(x=>x+".").join(" ");
+}
+function authorInitialsBeforeFamily(given){
+ return authorInitialLetters(given).map(x=>x+".").join(" ");
+}
+function authorsGB(item){
+ const authors=Array.isArray(item?.author)?item.author:[];
+ if(!authors.length)return"";
+ const formatted=authors.map(a=>{
+  const family=clean(a.family||a.name||"").toUpperCase();
+  const initials=authorInitialsCompact(a.given||"");
+  return (family+(initials?" "+initials:"")).trim();
+ }).filter(Boolean);
+ if(formatted.length>3)return formatted.slice(0,3).join(", ")+", et al.";
+ return formatted.join(", ");
+}
+function authorsAPA(item){
+ const authors=Array.isArray(item?.author)?item.author:[];
+ if(!authors.length)return"";
+ const formatted=authors.map(a=>{
+  const family=clean(a.family||a.name||"");
+  const initials=authorInitialsPeriods(a.given||"");
+  return (family+(initials?", "+initials:"")).trim();
+ }).filter(Boolean);
+ if(formatted.length===1)return formatted[0];
+ if(formatted.length<=20)return formatted.slice(0,-1).join(", ")+", & "+formatted[formatted.length-1];
+ return formatted.slice(0,19).join(", ")+", … "+formatted[formatted.length-1];
+}
+function authorsIEEE(item){
+ const authors=Array.isArray(item?.author)?item.author:[];
+ if(!authors.length)return"";
+ const formatted=authors.map(a=>{
+  const family=clean(a.family||a.name||"");
+  const initials=authorInitialsBeforeFamily(a.given||"");
+  return (initials+(initials?" ":"")+family).trim();
+ }).filter(Boolean);
+ if(formatted.length===1)return formatted[0];
+ if(formatted.length===2)return formatted[0]+" and "+formatted[1];
+ if(formatted.length<=6)return formatted.slice(0,-1).join(", ")+", and "+formatted[formatted.length-1];
+ return formatted[0]+" et al.";
+}
+function fullJournalOf(item){
+ return clean(item?.["container-title"]?.[0]||item?.["short-container-title"]?.[0]||"");
+}
+function sentenceTitle(item){
+ return applyTitleStyle(item?.title?.[0]||"",{sentenceCase:true});
+}
+function pageInfo(item){
+ return clean(item?.page||item?.["article-number"]||"");
+}
+function isArticleNumber(value){
+ return value && !/[-–—]/.test(value);
+}
+function formatGBT(item){
+ const authors=authorsGB(item);
+ const title=sentenceTitle(item);
+ const journal=fullJournalOf(item);
+ const year=yearOf(item);
+ const volume=clean(item?.volume||"");
+ const issue=clean(item?.issue||"");
+ const pages=pageInfo(item);
+ const doi=clean(item?.DOI||"");
+ let loc="";
+ if(year)loc+=year;
+ if(volume)loc+=(loc?", ":"")+volume;
+ if(issue)loc+="("+issue+")";
+ if(pages)loc+=(loc?": ":"")+pages;
+ let out=(authors?authors+". ":"")+(title?title+"[J]. ":"")+(journal?journal:"");
+ if(loc)out+=(out?", ":"")+loc;
+ if(doi)out+=". DOI: "+doi;
+ return out.replace(/\.\s*\./g,".").trim()+".";
+}
+function formatAPA(item){
+ const authors=authorsAPA(item);
+ const title=sentenceTitle(item);
+ const journal=fullJournalOf(item);
+ const year=yearOf(item);
+ const volume=clean(item?.volume||"");
+ const issue=clean(item?.issue||"");
+ const pages=pageInfo(item);
+ const doiUrl=doiUrlOf(item);
+ let out="";
+ if(authors)out+=authors+" ";
+ if(year)out+="("+year+"). ";
+ if(title)out+=title+". ";
+ if(journal)out+=journal;
+ if(volume)out+=(journal?", ":"")+volume;
+ if(issue)out+="("+issue+")";
+ if(pages)out+=(journal||volume?", ":"")+pages;
+ if(doiUrl)out+=". "+doiUrl;
+ return out.replace(/\.\s*\./g,".").trim();
+}
+function formatIEEE(item){
+ const authors=authorsIEEE(item);
+ const title=sentenceTitle(item);
+ const journal=fullJournalOf(item);
+ const year=yearOf(item);
+ const volume=clean(item?.volume||"");
+ const issue=clean(item?.issue||"");
+ const pages=pageInfo(item);
+ const doi=clean(item?.DOI||"");
+ const chunks=[];
+ let out="";
+ if(authors)out+=authors+", ";
+ if(title)out+='"'+title+'," ';
+ if(journal)out+=journal;
+ if(volume)chunks.push("vol. "+volume);
+ if(issue)chunks.push("no. "+issue);
+ if(pages)chunks.push(isArticleNumber(pages)?"Art. no. "+pages:"pp. "+pages);
+ if(year)chunks.push(year);
+ if(chunks.length)out+=(journal?", ":"")+chunks.join(", ");
+ if(doi)out+=", doi: "+doi;
+ return out.replace(/\s+,/g,",").trim()+".";
+}
+function displayCandidateAuthors(item){
+ const authors=Array.isArray(item?.author)?item.author:[];
+ if(!authors.length)return"—";
+ const names=authors.map(a=>clean((a.family||"")+(a.given?" "+a.given:""))).filter(Boolean);
+ if(names.length>5)return names.slice(0,5).join(", ")+" et al.";
+ return names.join(", ");
+}
+function renderSingleCandidateRows(candidates){
+ singleCandidateItems=(candidates||[]).map(entry=>entry.item);
+ const box=$("candidateBox"),rows=$("candidateRows");
+ rows.innerHTML="";
+ if(!candidates||!candidates.length){
+  box.classList.add("hidden");
+  return;
+ }
+ for(let i=0;i<candidates.length;i++){
+  const entry=candidates[i],item=entry.item;
+  const percent=Math.round((entry.confidence||0)*100)+"%";
+  const source=clean(item?._source||"未知");
+  const title=clean(item?.title?.[0]||"—");
+  const authors=displayCandidateAuthors(item);
+  const year=yearOf(item)||"—";
+  const journal=fullJournalOf(item)||"—";
+  const doi=clean(item?.DOI||"—");
+  const tr=document.createElement("tr");
+  tr.innerHTML=
+   '<td><button class="secondary mini select-candidate-btn" data-index="'+i+'">选择并生成</button></td>'+
+   '<td>'+esc(percent)+'</td>'+
+   '<td class="candidate-source">'+esc(source)+'</td>'+
+   '<td class="candidate-title">'+esc(title)+'</td>'+
+   '<td class="candidate-authors">'+esc(authors)+'</td>'+
+   '<td>'+esc(year)+'</td>'+
+   '<td>'+esc(journal)+'</td>'+
+   '<td>'+esc(doi)+'</td>';
+  rows.appendChild(tr);
+ }
+ rows.querySelectorAll(".select-candidate-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>selectCandidateAndGenerate(Number(btn.dataset.index)));
+ });
+ box.classList.remove("hidden");
+}
+function generateStylesFromItem(item,messageType="ok"){
+ $("gbtOutput").value=formatGBT(item);
+ $("apaOutput").value=formatAPA(item);
+ $("ieeeOutput").value=formatIEEE(item);
+ const title=clean(item?.title?.[0]||"");
+ const doi=clean(item?.DOI||"");
+ const source=clean(item?._source||"未知");
+ setSingleStatus("已生成三种格式。数据来源："+source+"；匹配题名："+title+(doi?"；DOI："+doi:""),messageType);
+}
+function selectCandidateAndGenerate(index){
+ const item=singleCandidateItems[index];
+ if(!item){
+  setSingleStatus("无法读取所选候选文献，请重新查询。","error");
+  return;
+ }
+ generateStylesFromItem(item,"ok");
+}
+async function generateThreeStyles(){
+ const query=$("singleQuery").value.trim();
+ const author=$("singleAuthor").value.trim();
+ const year=$("singleYear").value.trim();
+ const doi=$("singleDoi").value.trim();
+ if(!query&&!author&&!year&&!doi){setSingleStatus("请至少填写题名、作者、年份或 DOI 中的一项。","warn");return;}
+ $("singleGenerateBtn").disabled=true;
+ $("gbtOutput").value="";
+ $("apaOutput").value="";
+ $("ieeeOutput").value="";
+ renderSingleCandidateRows([]);
+ setSingleStatus("正在联网查找文献元数据，请稍候……","info");
+ try{
+  const look=await lookupSingleReference(query,author,year,doi);
+  renderSingleCandidateRows(look.candidates||[]);
+  if(!look.item){
+   setSingleStatus("没有找到候选文献。可以补充作者、年份或 DOI 后再次查询。","error");
+   return;
+  }
+  const st=classify(look.confidence,look.item);
+  if(doi||look.confidence>=.78){
+   generateStylesFromItem(look.item,st.css==="ok"?"ok":"warn");
+   if((look.candidates||[]).length>1){
+    setSingleStatus($("singleStatus").textContent+"。下方同时列出了其他候选结果，你也可以手动切换。",st.css==="ok"?"ok":"warn");
+   }
+   return;
+  }
+  const count=(look.candidates||[]).length;
+  setSingleStatus("已找到 "+count+" 条候选文献。最高匹配度为 "+Math.round((look.confidence||0)*100)+"%。请在下方候选列表中自行判断，并点击“选择并生成”。","warn");
+ }catch(e){
+  renderSingleCandidateRows([]);
+  setSingleStatus("联网查找失败："+e.message,"error");
+ }finally{
+  $("singleGenerateBtn").disabled=false;
+ }
+}
+function clearThreeStyles(){
+ $("singleQuery").value="";
+ $("singleAuthor").value="";
+ $("singleYear").value="";
+ $("singleDoi").value="";
+ $("gbtOutput").value="";
+ $("apaOutput").value="";
+ $("ieeeOutput").value="";
+ renderSingleCandidateRows([]);
+ setSingleStatus("三种格式区域已清空。","info");
+}
+async function copyTextFrom(id){
+ const text=$(id).value;
+ if(!text){setSingleStatus("当前没有可复制的内容。","warn");return;}
+ try{
+  await navigator.clipboard.writeText(text);
+  setSingleStatus("已复制。","ok");
+ }catch(e){
+  $(id).focus();$(id).select();
+  setSingleStatus(document.execCommand("copy")?"已复制。":"复制失败，请在文本框中按 Ctrl+C。","warn");
+ }
+}
+async function copyAllStyles(){
+ const groups=[
+  "GB/T 7714—2015\n"+$("gbtOutput").value,
+  "APA 7\n"+$("apaOutput").value,
+  "IEEE\n"+$("ieeeOutput").value
+ ].filter(x=>!x.endsWith("\n"));
+ if(!$("gbtOutput").value&&!$("apaOutput").value&&!$("ieeeOutput").value){
+  setSingleStatus("当前没有可复制的内容。","warn");return;
+ }
+ try{
+  await navigator.clipboard.writeText(groups.join("\n\n"));
+  setSingleStatus("三种格式已经复制到剪贴板。","ok");
+ }catch(e){
+  setSingleStatus("复制失败，请分别点击每个格式右侧的“复制”按钮。","warn");
+ }
+}
+$("singleGenerateBtn").addEventListener("click",generateThreeStyles);
+$("singleClearBtn").addEventListener("click",clearThreeStyles);
+$("copyAllStylesBtn").addEventListener("click",copyAllStyles);
+document.querySelectorAll(".copy-style-btn").forEach(btn=>btn.addEventListener("click",()=>copyTextFrom(btn.dataset.target)));
+
+$("detectBtn").addEventListener("click",detectAndShow);$("convertBtn").addEventListener("click",convert);$("testBtn").addEventListener("click",test);$("sampleBtn").addEventListener("click",sample);$("clearBtn").addEventListener("click",clearAll);$("copyBtn").addEventListener("click",copyOut);$("downloadBtn").addEventListener("click",download);
+if($("styleExample").value.trim()){
+ detectAndShow();
+}else{
+ $("advancedTemplate").value="";
+ $("templatePreview").textContent="请先在左侧粘贴一条标准参考文献，然后点击“识别示例格式”。";
+}
+})();
+</script>
+</body>
+</html>
